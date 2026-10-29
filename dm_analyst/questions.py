@@ -135,6 +135,7 @@ def q4_focus_store_drivers(df: pd.DataFrame) -> dict:
                           Snacks=("Snacks", "max"), Lines=("LineNum", "size"))
     attach = cats_by_bill.groupby("StoreName")[["Dry", "Wet", "Snacks"]].mean()
     attach["LinesPerBill"] = cats_by_bill.groupby("StoreName")["Lines"].mean()
+    rest_attach = cats_by_bill[cats_by_bill.StoreName != FOCUS][["Dry", "Wet", "Snacks"]].mean()  # pooled, not a mean of stores
 
     gross = (df.SaleQuantity.clip(lower=0) * df.UnitPrice)
     attach["DiscountRate"] = df.groupby("StoreName")["DiscountAmount"].sum() / gross.groupby(df.StoreName).sum()
@@ -159,6 +160,7 @@ def q4_focus_store_drivers(df: pd.DataFrame) -> dict:
 
     return {
         "attach_rates": attach,
+        "rest_attach_rates": rest_attach,
         "list_price_varies_across_stores_items": price_varies,
         "common_customers": int(len(both_ids)),
         "customers_in_multiple_stores_share": float(multi_store),
@@ -169,19 +171,19 @@ def q4_focus_store_drivers(df: pd.DataFrame) -> dict:
 
 
 # --------------------------------------------------------------------------- Q5
-def q5_kpi_baselines(df: pd.DataFrame, quality: dict) -> pd.DataFrame:
+def q5_kpi_baselines(q1: dict, q4: dict, quality: dict) -> pd.DataFrame:
     """Baseline values of the two recommended KPIs, for the numbers written in the answer."""
-    attach = q4_focus_store_drivers(df)["attach_rates"]
-    q1 = q1_stores(df)
+    attach, rest = q4["attach_rates"], q4["rest_attach_rates"]
+    cat = q1["categories"]
     exception_lines = (quality["bulk_lines"] + quality["discount_ge_gross_sale_lines"]
                        + quality["unit_cost_above_unit_price"])
     return pd.DataFrame([
         ("1. Wet-food attach rate, focus store", "% of receipts containing Wet Food", attach.loc[FOCUS, "Wet"], "up", "monthly",
-         f"rest of chain {attach.drop(FOCUS).Wet.mean():.0%}"),
+         f"rest of chain {rest.Wet:.1%}"),
         ("1. Snack attach rate, focus store", "% of receipts containing Snacks", attach.loc[FOCUS, "Snacks"], "up", "monthly",
-         f"rest of chain {attach.drop(FOCUS).Snacks.mean():.0%}"),
+         f"rest of chain {rest.Snacks:.1%}"),
         ("1. Gross margin, focus store", "profit / net sales", q1["focus_margin_actual"], "up", "monthly",
-         f"rest of chain {q1['categories'].RestProfit.sum() / q1['categories'].RestSales.sum():.1%}"),
+         f"rest of chain {cat.RestProfit.sum() / cat.RestSales.sum():.1%}"),
         ("2. Exception lines per month", "bulk lines + discount>=gross + cost>price", exception_lines / 12, "down", "monthly",
          "2025 monthly average"),
     ], columns=["KPI", "Calculation", "Baseline", "Desired direction", "Frequency", "Reference"])

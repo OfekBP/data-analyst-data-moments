@@ -5,6 +5,3 @@ __pycache__/
 ~$*.xlsx
 .DS_Store
 
-# The exam file is not ours to publish; see README for where to put it.
-data/raw/*
-!data/raw/.gitkeep

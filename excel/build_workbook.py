@@ -8,14 +8,16 @@ Excel result next to the Python result for the main figures.
 """
 import pandas as pd
 from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter as L
 
 from dm_analyst import config
 from dm_analyst.load import load_raw
+from dm_analyst.run_analysis import compute_all
 
 OUT = config.EXCEL_PATH
 df = load_raw()
+R = compute_all()  # the Python results the Checks sheet compares against
 N = len(df)
 LAST = N + 1
 
@@ -28,7 +30,6 @@ title_font = Font(name=F, size=14, bold=True)
 hdr_fill = PatternFill('solid', fgColor='1F3A5F')
 key_fill = PatternFill('solid', fgColor='FFF2CC')
 note_font = Font(name=F, size=9, italic=True, color='595959')
-thin = Side(style='thin', color='BFBFBF')
 
 wb = Workbook()
 
@@ -66,22 +67,19 @@ for i, row in enumerate(vals):
         f'=IF(AND(D{r}=D{r+1},B{r}=B{r+1}),0,1)',                         # Z IsLast
         f'=IF(Y{r}=1,AA{r-1},0)+V{r}',                                    # AA BillRun
         f'=IF(Z{r}=1,AA{r},"")',                                          # AB BillTotal
-        f'=IF(Y{r}=1,AC{r-1},0)+AI{r}',                                   # AC BigRun
+        f'=IF(Y{r}=1,AC{r-1},0)+AH{r}',                                   # AC BigRun
         f'=IF(AND(Z{r}=1,AC{r}=0),AA{r},"")',                             # AD BillTotalExBig
         f'=IF(Y{r}=1,AE{r-1},0)+IF(AND(U{r}=1,K{r}="Dry Food"),1,0)',     # AE DryRun
         f'=IF(Y{r}=1,AF{r-1},0)+IF(AND(U{r}=1,K{r}="Wet Food"),1,0)',     # AF WetRun
         f'=IF(Y{r}=1,AG{r-1},0)+IF(AND(U{r}=1,K{r}="Snacks"),1,0)',       # AG SnackRun
         f'=IF(AND(U{r}=1,M{r}>=Assumptions!$B$4),1,0)',                   # AH BigLine
-        f'=IF(AND(U{r}=1,P{r}>0,P{r}>=M{r}*N{r}),1,0)',                   # AI DiscOver  (placeholder, fixed below)
+        f'=IF(AND(U{r}=1,P{r}>0,P{r}>=M{r}*N{r}),1,0)',                   # AI DiscOver
         f'=IF(AND(U{r}=1,O{r}>N{r}),1,0)',                                # AJ CostGtPrice
     ]
     wd.append(out + f)
 
-# BigRun must use the BigLine flag column: AH. Columns: T..AJ -> verify letters
 col = {h: L(len(raw_cols) + 1 + i) for i, h in enumerate(helpers)}
 assert col['Dup'] == 'T' and col['BigRun'] == 'AC' and col['BigLine'] == 'AH' and col['DiscOver'] == 'AI'
-for r in range(2, LAST + 1):
-    wd[f'AC{r}'] = f'=IF(Y{r}=1,AC{r-1},0)+AH{r}'
 for r in range(2, LAST + 1):
     wd[f'A{r}'].number_format = 'yyyy-mm-dd'
 wd.freeze_panes = 'A2'
@@ -350,9 +348,9 @@ title(w5, 'שאלה 5 - המלצות ומדדי KPI', 'מצב התחלתי מח�
 header(w5, 4, ['המלצה', 'חישוב ה-KPI', 'מצב התחלתי', 'כיוון רצוי', 'תדירות', 'הערות / נימוק'])
 put(w5, 'A5', '1. הגדלת נוכחות וט פוד וחטיפים בחיפה', bold)
 put(w5, 'B5', 'אחוז קבלות בחיפה שכוללות וט פוד'); put(w5, 'C5', "=Q4_Haifa_Mix!C6", fmt=PCT, fill=key_fill)
-put(w5, 'D5', 'עלייה'); put(w5, 'E5', 'חודשי'); put(w5, 'F5', 'בשאר הרשת הערך קרוב ל-66%: ייחוס טבעי ליעד')
+put(w5, 'D5', 'עלייה'); put(w5, 'E5', 'חודשי'); put(w5, 'F5', 'בשאר הרשת כ-66.5%: ייחוס טבעי ליעד')
 put(w5, 'B6', 'אחוז קבלות בחיפה שכוללות חטיפים'); put(w5, 'C6', "=Q4_Haifa_Mix!C7", fmt=PCT, fill=key_fill)
-put(w5, 'D6', 'עלייה'); put(w5, 'E6', 'חודשי'); put(w5, 'F6', 'בשאר הרשת כ-46%')
+put(w5, 'D6', 'עלייה'); put(w5, 'E6', 'חודשי'); put(w5, 'F6', 'בשאר הרשת כ-46.5%')
 put(w5, 'B7', 'שולי רווח בחיפה'); put(w5, 'C7', "=Q1_Stores!B29", fmt=PCT, fill=key_fill)
 put(w5, 'D7', 'עלייה'); put(w5, 'E7', 'חודשי'); put(w5, 'F7', 'פוטנציאל רווח נוסף: ראו Q1_Stores!B32')
 put(w5, 'A9', '2. בקרת שורות חריגות', bold)
@@ -368,26 +366,28 @@ setup(wc, {'A': 52, 'B': 18, 'C': 18, 'D': 12})
 title(wc, 'אימות: תוצאות Excel מול Python (pandas)', 'ערכי Python הם קלט קשיח (כחול) שחושב על אותם נתונים; ההפרש מחושב')
 header(wc, 4, ['בדיקה', 'Excel', 'Python', 'הפרש'])
 checks = [
-    ('סה"כ מכירות נטו (₪)', '=Q1_Stores!G5', 3520099.61),
-    ('סה"כ רווח גולמי (₪)', '=Q1_Stores!G6', 1157552.43),
-    ('מספר קבלות', '=Q1_Stores!G8', 15588),
-    ('ממוצע סכום קבלה', '=Q2_MeanMedian!B6', 225.82111945085967),
-    ('חציון סכום קבלה', '=Q2_MeanMedian!B7', 186.545),
-    ('מכירות חיפה (₪)', '=Q1_Stores!C5', 835934.94),
-    ('שולי רווח חיפה', '=Q1_Stores!C7', 0.2791968116561798),
-    ('מכירות דרי פוד Q1', '=Q3_Categories!B5', 603302.80),
-    ('מכירות וט פוד Q4', '=Q3_Categories!C6', 236233.28),
-    ('% קבלות חיפה עם וט פוד', '=Q4_Haifa_Mix!C6', 0.391),
+    ('סה"כ מכירות נטו (₪)', '=Q1_Stores!G5', R['q1']['stores'].Sales.sum()),
+    ('סה"כ רווח גולמי (₪)', '=Q1_Stores!G6', R['q1']['stores'].Profit.sum()),
+    ('מספר קבלות', '=Q1_Stores!G8', R['q2']['bills']),
+    ('ממוצע סכום קבלה', '=Q2_MeanMedian!B6', R['q2']['mean']),
+    ('חציון סכום קבלה', '=Q2_MeanMedian!B7', R['q2']['median']),
+    ('ממוצע ללא קבלות עם שורה חריגה', '=Q2_MeanMedian!B18', R['q2']['mean_ex_bulk']),
+    ('מכירות חיפה (₪)', '=Q1_Stores!C5', R['q1']['stores'].loc['Haifa', 'Sales']),
+    ('שולי רווח חיפה', '=Q1_Stores!C7', R['q1']['stores'].loc['Haifa', 'Margin']),
+    ('שולי רווח חיפה בתמהיל שאר הרשת', '=Q1_Stores!B30', R['q1']['focus_margin_at_rest_mix']),
+    ('מכירות דרי פוד Q1', '=Q3_Categories!B5', R['q3']['categories'].loc['Dry Food', 'Sales_Q1']),
+    ('מכירות וט פוד Q4', '=Q3_Categories!C6', R['q3']['categories'].loc['Wet Food', 'Sales_Q4']),
+    ('% קבלות חיפה עם וט פוד', '=Q4_Haifa_Mix!C6', R['q4']['attach_rates'].loc['Haifa', 'Wet']),
 ]
 for i, (a, f, pv) in enumerate(checks):
     r = 5 + i
     put(wc, f'A{r}', a); put(wc, f'B{r}', f, fmt='#,##0.000'); put(wc, f'C{r}', pv, blue, '#,##0.000')
     put(wc, f'D{r}', f'=B{r}-C{r}', fmt='0.000')
-put(wc, 'A17', 'לקוחות שקנו גם בחיפה וגם בסניף אחר (בדיקת Python בלבד)', bold)
-put(wc, 'A18', 'מספר לקוחות משותפים'); put(wc, 'C18', 1294, blue)
-put(wc, 'A19', 'משקל דרי פוד של אותם לקוחות בחיפה'); put(wc, 'C19', 0.794, blue, PCT)
-put(wc, 'A20', 'משקל דרי פוד של אותם לקוחות בשאר הרשת'); put(wc, 'C20', 0.497, blue, PCT)
-put(wc, 'A21', 'מקור: pandas על הנתונים המנוקים; לא משוחזר בנוסחאות כי דורש קיבוץ לפי לקוח.', note_font)
+put(wc, 'A19', 'לקוחות שקנו גם בחיפה וגם בסניף אחר (בדיקת Python בלבד)', bold)
+put(wc, 'A20', 'מספר לקוחות משותפים'); put(wc, 'C20', R['q4']['common_customers'], blue)
+put(wc, 'A21', 'משקל דרי פוד של אותם לקוחות בחיפה'); put(wc, 'C21', R['q4']['common_customer_category_mix'].loc['Haifa', 'Dry Food'], blue, PCT)
+put(wc, 'A22', 'משקל דרי פוד של אותם לקוחות בשאר הרשת'); put(wc, 'C22', R['q4']['common_customer_category_mix'].loc['Rest of chain', 'Dry Food'], blue, PCT)
+put(wc, 'A23', 'מקור: pandas על הנתונים המנוקים; לא משוחזר בנוסחאות כי דורש קיבוץ לפי לקוח.', note_font)
 
 wb.move_sheet('Data', offset=len(wb.sheetnames))
 for ws in wb.worksheets:

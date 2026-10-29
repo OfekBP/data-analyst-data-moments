@@ -17,13 +17,14 @@ def compute_all() -> dict:
     raw = load_raw()
     df = clean(raw)
     quality = quality_report(raw)
+    q1, q4 = q1_stores(df), q4_focus_store_drivers(df)
     return {
         "quality": quality,
-        "q1": q1_stores(df),
+        "q1": q1,
         "q2": q2_receipt_distribution(df),
         "q3": q3_category_change(df),
-        "q4": q4_focus_store_drivers(df),
-        "q5": q5_kpi_baselines(df, quality),
+        "q4": q4,
+        "q5": q5_kpi_baselines(q1, q4, quality),
         "df": df,
     }
 
@@ -43,6 +44,7 @@ def main() -> None:
     r["q3"]["dry_share_by_group"].round(4).to_csv(config.TABLES / "q3_dry_share_by_quarter.csv")
     r["q3"]["wet_share_by_group"].round(4).to_csv(config.TABLES / "q3_wet_share_by_quarter.csv")
     r["q4"]["attach_rates"].round(4).to_csv(config.TABLES / "q4_attach_rates.csv")
+    r["q4"]["rest_attach_rates"].round(4).to_csv(config.TABLES / "q4_rest_of_chain_attach_rates.csv", header=["RestOfChain"])
     r["q4"]["common_customer_category_mix"].round(4).to_csv(config.TABLES / "q4_common_customers_mix.csv")
     r["q5"].round(4).to_csv(config.TABLES / "q5_kpis.csv", index=False)
 

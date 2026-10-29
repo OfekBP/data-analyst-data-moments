@@ -14,7 +14,7 @@ Every headline number is computed three independent ways and checked by tests:
 
 ## Layout
 ```
-data/raw/            exam file goes here as analyst_exam.xlsx (git-ignored)
+data/raw/            analyst_exam.xlsx - the exam file (synthetic data, published with permission)
 dm_analyst/          load.py (clean), quality.py (data checks), questions.py (Q1-Q5), run_analysis.py, sql_check.py
 sql/                 one query per question
 excel/               build_workbook.py, recalc.ps1, the workbook

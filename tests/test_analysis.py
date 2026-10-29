@@ -5,9 +5,6 @@ Three layers:
   2. SQL results must equal the pandas results;
   3. the Excel workbook (live formulas, recalculated) must equal the pandas results.
 """
-import math
-
-import pandas as pd
 import pytest
 
 from dm_analyst import config, run_analysis, sql_check
@@ -39,9 +36,10 @@ def test_delivered_columns_are_arithmetically_consistent(res):
     assert q["unit_price_varies_within_item"] == 0
 
 
-def test_bill_key_requires_store_code():
+def test_bill_numbers_do_not_overlap_between_stores_in_this_file():
+    # True here, but the code still keys receipts on StoreCode + BillNum, as the brief requires.
     raw = load_raw()
-    assert raw.groupby("BillNum")["StoreCode"].nunique().max() == 1  # holds in this file, but the key still uses both
+    assert raw.groupby("BillNum")["StoreCode"].nunique().max() == 1
 
 
 # ------------------------------------------------------------------ headline numbers
@@ -88,8 +86,10 @@ def test_q4_same_customers_buy_differently_in_focus_store(res):
     assert mix[config.FOCUS_STORE] == pytest.approx(0.794, abs=1e-3)
     assert mix["Rest of chain"] == pytest.approx(0.497, abs=1e-3)
     assert q4["common_customers"] == 1294
-    a = q4["attach_rates"]
+    a, rest = q4["attach_rates"], q4["rest_attach_rates"]
     assert a.loc[config.FOCUS_STORE, "Wet"] == pytest.approx(0.391, abs=1e-3)
+    assert rest["Wet"] == pytest.approx(0.665, abs=1e-3)
+    assert rest["Snacks"] == pytest.approx(0.465, abs=1e-3)
 
 
 # ------------------------------------------------------------------ SQL == pandas
