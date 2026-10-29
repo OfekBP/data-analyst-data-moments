@@ -1,0 +1,60 @@
+{
+  "quality": {
+    "rows_raw": 41685,
+    "rows_clean": 41626,
+    "duplicate_lines_removed": 59,
+    "duplicate_sales_removed": 5550.19,
+    "sales_raw": 3525649.8,
+    "sales_clean": 3520099.61,
+    "store_ranking_unchanged_by_cleaning": true,
+    "return_lines": 72,
+    "return_sales": -4915.73,
+    "bulk_lines": 77,
+    "bulk_sales_share": 0.051,
+    "discount_ge_gross_sale_lines": 130,
+    "unit_cost_above_unit_price": 104,
+    "unit_cost_off_item_mode": 104,
+    "customer_code_missing": 247,
+    "customer_code_unidentified_zero": 6922,
+    "bills_with_both_channels": 2980,
+    "line_sales_formula_violations": 0,
+    "line_cost_formula_violations": 0,
+    "unit_price_varies_within_item": 0
+  },
+  "q1": {
+    "focus_margin_actual": 0.2791968116561798,
+    "focus_margin_at_rest_mix": 0.34253331070746906,
+    "focus_extra_profit_same_sales": 52945.19253424952
+  },
+  "q2": {
+    "bills": 15588,
+    "mean": 225.82111945085967,
+    "median": 186.54500000000002,
+    "gap": 39.27611945085965,
+    "gap_pct_of_median": 0.21054501300415263,
+    "std": 244.4665046721901,
+    "skew": 13.253323521318956,
+    "share_below_mean": 0.6111752630228381,
+    "p90": 408.6340000000002,
+    "p99": 698.3395999999985,
+    "max": 8501.78,
+    "top_decile_sales_share": 0.2710834765269611,
+    "bills_with_bulk_line": 77,
+    "mean_ex_bulk": 214.73995551544067,
+    "median_ex_bulk": 185.73,
+    "gap_ex_bulk": 29.00995551544068,
+    "gap_explained_by_bulk": 0.2613843750084194
+  },
+  "q3": {
+    "total_sales_change_pct": 0.011719963987505855,
+    "total_profit_change_pct": 0.12496287431324471,
+    "margin_Q1": 0.3099649503048139,
+    "margin_Q4": 0.34465966259767483
+  },
+  "q4": {
+    "list_price_varies_across_stores_items": 0,
+    "common_customers": 1294,
+    "customers_in_multiple_stores_share": 0.9943714821763602,
+    "items_compared": 48
+  }
+}
