@@ -17,5 +17,5 @@ LINE_KEY = ["StoreCode", "BillNum", "LineNum"]
 BULK_QTY = 20
 
 # By default the focus store is chosen from the numbers (largest profit upside, see
-# questions.pick_focus_store). Set a store name here only to force a different one.
+# questions.pick_store). Set a store name here only to force a different one.
 FOCUS_STORE_OVERRIDE = None
