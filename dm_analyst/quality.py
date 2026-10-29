@@ -28,6 +28,9 @@ def quality_report(raw: pd.DataFrame) -> dict:
         "return_lines": int((df["SaleQuantity"] < 0).sum()),
         "return_sales": round(float(df.loc[df["SaleQuantity"] < 0, "LineSales"].sum()), 2),
         "bulk_lines": int((df["SaleQuantity"] >= config.BULK_QTY).sum()),
+        # The threshold should sit in a real gap in the quantity distribution; these two show it.
+        "max_quantity_below_bulk_threshold": int(df.loc[df["SaleQuantity"] < config.BULK_QTY, "SaleQuantity"].max()),
+        "min_quantity_at_or_above_bulk_threshold": int(df.loc[df["SaleQuantity"] >= config.BULK_QTY, "SaleQuantity"].min()),
         "bulk_sales_share": round(float(df.loc[df["SaleQuantity"] >= config.BULK_QTY, "LineSales"].sum()
                                         / df["LineSales"].sum()), 4),
         "discount_ge_gross_sale_lines": int(((df["SaleQuantity"] > 0) & (df["DiscountAmount"] > 0)
