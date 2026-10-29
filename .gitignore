@@ -5,3 +5,6 @@ __pycache__/
 ~$*.xlsx
 .DS_Store
 
+# copied into the site at deploy time (see vercel.json)
+site/calculations/
+

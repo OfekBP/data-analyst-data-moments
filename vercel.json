@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": null,
+  "buildCommand": "mkdir -p site/calculations && cp excel/DataMoments_Analyst_Calculations.xlsx site/calculations/ && cp -r outputs/tables site/calculations/tables",
+  "outputDirectory": "site",
+  "cleanUrls": true
+}

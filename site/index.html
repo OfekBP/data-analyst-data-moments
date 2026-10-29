@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>תרגיל אנליסט נתונים - Ofek Ben Porat</title>
+<meta name="description" content="הגשת תרגיל חשיבה עסקית לאנליסט נתונים: תשובות לחמש שאלות על רשת חנויות לחיות מחמד, איכות נתונים ואימות, עם חישובים שאפשר לעקוב אחריהם.">
+<meta name="theme-color" content="#131313">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23A2E5E7'/%3E%3Cstop offset='1' stop-color='%23BDB1D8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Cpath d='M6 24V9l7 8 5-6 3 3v-5h4v14h-4v-6l-3-3-5 6-7-8v9z' fill='%234A3F78'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#131313;
+  --purple:#4A3F78;
+  --purple-2:#5E5486;
+  --cream:#FCFDF4;
+  --cream-2:#F9FAE8;
+  --teal:#A2E5E7;
+  --teal-d:#2A9FA5;
+  --lav:#BDB1D8;
+  --blue:#0A5BD8;
+  --line:rgba(74,63,120,.18);
+  --grad:linear-gradient(135deg,#A2E5E7 0%,rgba(189,177,216,.89) 100%);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --radius:20px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:"Rubik",system-ui,"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+::selection{background:var(--teal);color:var(--purple)}
+a{color:var(--blue);text-underline-offset:.2em}
+a:hover{color:var(--purple)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:6px}
+h1,h2,h3,h4{font-weight:500;color:var(--purple);margin:0;text-wrap:balance}
+p{margin:0 0 .85em;max-width:68ch;text-wrap:pretty}
+ul{margin:0 0 1em;padding-inline-start:1.2em;max-width:68ch}
+li{margin-bottom:.3em}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+*{scrollbar-width:thin;scrollbar-color:var(--lav) transparent}
+
+/* ---------- masthead ---------- */
+.mast{background:var(--ink);color:var(--cream)}
+.mast-in{max-width:1120px;margin:auto;padding:12px 24px;display:flex;align-items:center;gap:28px}
+.logo-tile{background:#fff;border-radius:14px;padding:4px 10px;display:flex;line-height:0}
+.logo-tile img{height:40px;width:auto}
+.mast nav{display:flex;gap:26px;margin-inline-start:auto;align-items:center}
+.mast nav a{color:var(--cream);text-decoration:none;font-size:15px;padding:6px 0;border-bottom:2px solid transparent;transition:border-color .25s}
+.mast nav a:hover{border-color:var(--teal);color:var(--cream)}
+.mast nav a.pill-grad,.mast nav a.pill-grad:hover{color:var(--ink);border-color:transparent;padding:9px 20px}
+.pill{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:12px 26px;font:500 16px/1.3 "Rubik",sans-serif;text-decoration:none;border:2px solid var(--purple);cursor:pointer;transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s}
+.pill svg{width:20px;height:20px;flex:none}
+.pill-solid{background:var(--purple);color:var(--cream)}
+.pill-solid:hover{background:#3b3162;color:var(--cream);transform:translateY(-2px);box-shadow:0 8px 18px -8px rgba(74,63,120,.7)}
+.pill-line{background:transparent;color:var(--purple)}
+.pill-line:hover{background:var(--purple);color:var(--cream);transform:translateY(-2px)}
+.pill-grad{background:var(--grad);color:var(--ink);border-color:transparent;padding:10px 22px;font-size:15px}
+.pill-grad:hover{color:var(--ink);transform:translateY(-2px);box-shadow:0 8px 18px -8px rgba(162,229,231,.9)}
+
+/* ---------- hero ---------- */
+.hero{
+  background:
+    radial-gradient(60% 90% at 88% 8%,rgba(98,82,196,.62),transparent 70%),
+    radial-gradient(50% 80% at 8% 100%,rgba(39,180,196,.42),transparent 70%),
+    linear-gradient(160deg,#0e1330 0%,#1d2358 55%,#2c2a68 100%);
+  padding:clamp(32px,6vw,72px) 24px clamp(40px,6vw,72px);
+}
+.hero-card{max-width:860px;margin:auto;background:var(--cream);border-radius:18px;padding:clamp(28px,5vw,52px);text-align:center;box-shadow:0 30px 60px -28px rgba(0,0,0,.6)}
+.hero h1{font-size:clamp(1.9rem,4.6vw,3.2rem);line-height:1.3}
+.hero .lede{margin:18px auto 0;color:#2c2842;font-size:clamp(1rem,1.7vw,1.12rem)}
+.hero .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.hero .meta{margin:22px auto 0;font-size:14px;color:var(--purple-2);max-width:none}
+
+/* ---------- executive summary band ---------- */
+.exec{background:var(--grad);color:var(--ink)}
+.exec-in{max-width:1000px;margin:auto;padding:34px 24px;display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:26px;align-items:start}
+.exec h2{font-size:1.5rem;color:var(--ink);line-height:1.3;padding-top:2px}
+.exec p{margin:0;font-size:15.5px;line-height:1.6}
+.exec b{font-weight:600;color:var(--ink)}
+
+/* ---------- main ---------- */
+main{max-width:900px;margin:0 auto;padding:44px 24px 28px}
+.lead-row{display:flex;align-items:end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin:0 0 18px}
+.sec-title{font-size:clamp(1.5rem,3vw,2rem)}
+.tools{display:flex;gap:10px}
+.tool{background:transparent;border:1.5px solid var(--line);border-radius:999px;padding:8px 18px;color:var(--purple);font:400 14px/1.3 "Rubik",sans-serif;cursor:pointer;transition:background .2s,border-color .2s}
+.tool:hover{background:var(--cream-2);border-color:var(--purple)}
+.group-title{font-size:1.3rem;margin:38px 0 14px}
+
+.q{border:1.5px solid var(--line);border-radius:var(--radius);background:var(--cream);margin-bottom:12px;transition:border-color .3s,box-shadow .4s var(--ease),background .3s}
+.q:hover{border-color:rgba(74,63,120,.45)}
+.q.open{border-color:var(--purple);background:#fff;box-shadow:0 22px 40px -28px rgba(74,63,120,.65)}
+.q h3{font-size:1.4rem;font-weight:500}
+.q-head{all:unset;font:inherit;line-height:1.5;color:inherit;box-sizing:border-box;display:flex;align-items:flex-start;gap:16px;width:100%;padding:20px 22px;cursor:pointer;border-radius:var(--radius)}
+.q-head:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.badge{flex:none;width:44px;height:44px;border-radius:50%;background:var(--grad);color:var(--purple);display:grid;place-items:center;font-weight:600;font-size:1.1rem;transition:transform .5s var(--ease)}
+.q.open .badge{transform:rotate(360deg)}
+.q-text{flex:1;min-width:0}
+.q-title{display:block;font-size:1em;font-weight:500;color:var(--purple);line-height:1.3}
+.q-ans{display:block;margin-top:5px;color:#2c2842;font-size:16px;font-weight:400;line-height:1.55}
+.chev{flex:none;width:26px;height:26px;margin-top:9px;color:var(--purple);transition:transform .45s var(--ease)}
+.q.open .chev{transform:rotate(180deg)}
+.panel{display:grid;grid-template-rows:1fr;transition:grid-template-rows .55s var(--ease)}
+.js .panel{grid-template-rows:0fr}
+.js .q.open .panel{grid-template-rows:1fr}
+.panel-clip{overflow:hidden;min-height:0}
+.panel-in{padding:6px 24px 24px}
+.js .q:not(.open) .panel-in{visibility:hidden}
+.brief{margin:0 0 14px;padding:10px 14px;background:var(--cream-2);border-radius:12px;font-size:14.5px;color:var(--purple-2);max-width:none;line-height:1.5}
+.brief b{color:var(--purple);font-weight:500}
+.panel h4{font-size:1.12rem;font-weight:500;color:var(--purple);margin:16px 0 6px}
+.src{margin-top:18px;font-size:14px;color:var(--purple-2);max-width:none;border-top:1px solid var(--line);padding-top:10px}
+.src a{margin-inline-end:12px;white-space:nowrap}
+
+/* ---------- charts ---------- */
+.chart{margin:10px 0 8px;background:var(--cream-2);border-radius:16px;padding:14px 16px 10px}
+.seg{display:inline-flex;gap:4px;background:rgba(74,63,120,.09);border-radius:999px;padding:4px;margin-bottom:12px;flex-wrap:wrap}
+.seg button{all:unset;line-height:1.4;box-sizing:border-box;cursor:pointer;padding:7px 15px;border-radius:999px;font-size:14px;color:var(--purple);transition:background .25s,color .25s}
+.seg button:hover{background:rgba(74,63,120,.12)}
+.seg button[aria-pressed="true"]{background:var(--purple);color:var(--cream)}
+.seg button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.rows{display:grid;gap:6px}
+.row{display:grid;grid-template-columns:minmax(78px,170px) 1fr;gap:12px;align-items:center;font-size:15px}
+.row-l small{display:block;color:var(--purple-2);font-size:12.5px;line-height:1.25}
+.track{position:relative;height:26px;direction:ltr;border-radius:8px;background:rgba(74,63,120,.06)}
+.bar{position:absolute;top:3px;bottom:3px;border-radius:6px;background:var(--lav);width:0;transition:width .8s var(--ease)}
+.bar.focus{background:var(--purple)}
+.zero{position:absolute;top:0;bottom:0;width:1.5px;background:rgba(74,63,120,.55)}
+.ref{position:absolute;top:-3px;bottom:-3px;width:0;border-inline-start:2px dashed var(--teal-d)}
+.val{position:absolute;top:50%;font-size:13.5px;font-weight:500;color:var(--purple);white-space:nowrap;padding:0 8px;direction:rtl;transform:translateY(-50%);transition:left .8s var(--ease)}
+.note{margin:8px 2px 2px;font-size:14.5px;color:#2c2842;max-width:none;min-height:2.6em}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13.5px;color:var(--purple-2);margin-top:8px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-inline-end:6px;vertical-align:-1px}
+.stack{display:flex;height:32px;border-radius:9px;overflow:hidden;direction:ltr;background:rgba(74,63,120,.06)}
+.stack i{display:grid;place-items:center;font-style:normal;font-size:12.5px;font-weight:500;color:var(--ink);min-width:0;overflow:hidden;white-space:nowrap;width:0;transition:width .9s var(--ease)}
+.dumb{position:relative;height:30px;direction:ltr;border-radius:8px;background:rgba(74,63,120,.06)}
+.dumb .line{position:absolute;top:50%;height:3px;margin-top:-1.5px;background:var(--lav);transition:left .8s var(--ease),width .8s var(--ease)}
+.dumb .dot{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;transition:left .8s var(--ease);border:2px solid #fff}
+.dot.h{background:var(--purple)}
+.dot.r{background:var(--teal-d)}
+.dot-v{position:absolute;transform:translateX(-50%);font-size:12.5px;font-weight:500;color:var(--purple);transition:left .8s var(--ease)}
+
+/* ---------- tables, blocks ---------- */
+.tbl{width:100%;border-collapse:collapse;font-size:15px;margin:6px 0 4px;max-width:none}
+.tbl caption{text-align:start;font-size:14px;color:var(--purple-2);padding-bottom:6px;caption-side:top}
+.tbl th,.tbl td{padding:8px 10px;text-align:start;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font-weight:500;color:var(--purple);background:var(--cream-2)}
+.tbl td.n,.tbl th.n{text-align:end;font-variant-numeric:tabular-nums}
+.tbl tr.hl td{background:rgba(162,229,231,.28);font-weight:500}
+.tbl tfoot td{font-weight:500;background:var(--cream-2)}
+.tblwrap{overflow-x:auto;margin:6px -4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0 4px}
+.two>div{background:var(--cream-2);border-radius:14px;padding:12px 16px}
+.two h4{margin:0 0 4px}
+.two p{margin:0;font-size:15px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:8px 0}
+.three section{border-top:3px solid var(--lav);padding-top:10px}
+.three section.found{border-color:var(--teal-d)}
+.three section.hyp{border-color:var(--purple)}
+.three h4{margin:0 0 6px}
+.three ul{font-size:15px;padding-inline-start:1.1em;margin:0}
+details.calc{margin:18px 0 4px;border:1.5px dashed rgba(74,63,120,.4);border-radius:14px;background:var(--cream)}
+details.calc>summary{cursor:pointer;list-style:none;padding:12px 18px;color:var(--purple);font-weight:500;display:flex;align-items:center;gap:10px;border-radius:14px}
+details.calc>summary::-webkit-details-marker{display:none}
+details.calc>summary::before{content:"";width:9px;height:9px;border-inline-end:2.5px solid var(--purple);border-bottom:2.5px solid var(--purple);transform:rotate(45deg) translateY(-2px);transition:transform .35s var(--ease)}
+details.calc[open]>summary::before{transform:rotate(-135deg) translateY(-2px)}
+details.calc>summary:hover{background:var(--cream-2)}
+details.calc .calc-in{padding:4px 18px 16px}
+.steps{margin:0 0 12px;padding-inline-start:1.4em;font-size:15.5px;max-width:none}
+.steps li{margin-bottom:.45em}
+.dl{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 16px}
+
+/* ---------- closing band + footer ---------- */
+.cta-band{background:var(--grad);color:var(--ink)}
+.cta-in{max-width:900px;margin:auto;padding:38px 24px;display:flex;gap:24px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.cta-in h2{color:var(--ink);font-size:1.5rem;line-height:1.3}
+.cta-in p{margin:6px 0 0;font-size:15.5px}
+.cta-in .acts{display:flex;gap:12px;flex-wrap:wrap}
+footer{background:var(--ink);color:var(--cream)}
+.foot{max-width:900px;margin:auto;padding:22px 24px;display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap;font-size:14px;color:#cfd0c4}
+.foot a{color:var(--teal)}
+
+@media (max-width:820px){
+  .exec-in{grid-template-columns:1fr;gap:14px;padding:26px 16px}
+}
+@media (max-width:760px){
+  body{font-size:16px}
+  .mast nav a:not(.pill){display:none}
+  .mast-in{padding:10px 16px}
+  .hero{padding-inline:16px}
+  main{padding-inline:16px}
+  .q-head{padding:16px}
+  .panel-in{padding:4px 16px 20px}
+  .two,.three{grid-template-columns:1fr}
+  .row{grid-template-columns:1fr;gap:3px}
+  .cta-in{padding-inline:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media print{
+  .mast,.tools,.cta,.chev,.seg,.cta-band,details.calc,.dl{display:none}
+  .hero{background:none;padding:8px 0}
+  .hero-card{box-shadow:none;border:1px solid #999;padding:16px}
+  .exec{background:none;border-block:1px solid #999}
+  .js .panel{grid-template-rows:1fr!important}
+  .js .q:not(.open) .panel-in{visibility:visible}
+  .q{break-inside:avoid;box-shadow:none}
+  body{font-size:12px;line-height:1.5}
+  footer{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-in">
+    <a class="logo-tile" href="https://www.data-moments.com/" aria-label="Data Moments">
+      <img src="assets/logo.png" alt="Data Moments">
+    </a>
+    <nav aria-label="ניווט בדף">
+      <a href="#answers">חמש התשובות</a>
+      <a href="#data-quality">איכות נתונים</a>
+      <a href="#calcs">חישובים תומכים</a>
+      <a class="pill pill-grad" href="https://github.com/OfekBP/data-analyst-data-moments" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-card">
+    <h1>חיפה מוכרת הכי הרבה, ומרוויחה הכי פחות מכל שקל</h1>
+    <p class="lede">תשובות להנהלת רשת חנויות לחיות מחמד על ביצועי חמשת הסניפים ב-2025, עם חישובים שאפשר לעקוב אחריהם עד המספר האחרון.</p>
+    <div class="cta">
+      <a class="pill pill-solid" href="#answers">לחמש התשובות</a>
+      <a class="pill pill-line" href="https://github.com/OfekBP/data-analyst-data-moments" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        הקוד והחישובים
+      </a>
+    </div>
+    <p class="meta">הגשת תרגיל חשיבה עסקית לאנליסט נתונים · Ofek Ben Porat · נתוני 2025 סינתטיים · שקלים לפני מע"מ</p>
+  </div>
+</section>
+
+<section class="exec" aria-label="תקציר מנהלים">
+  <div class="exec-in">
+    <h2>תקציר<br>מנהלים</h2>
+    <p><b>מה מצאנו.</b> חיפה היא הסניף הגדול ביותר (836 אלף ₪) אך בשולי הרווח הנמוכים ביותר: 27.9% מול 34.4% בשאר הרשת.</p>
+    <p><b>למה.</b> התמהיל: 80% מהמכירות בדרי פוד (בשאר הרשת 50%). אותם לקוחות קונים אחרת בחיפה, כלומר ההסבר בסניף ולא בלקוחות.</p>
+    <p><b>מה עושים.</b> להגדיל בחיפה את הוט פוד והחטיפים (כ-53 אלף ₪ בשנה), ולחסום מכירה מתחת לעלות (כ-8 אלף ₪).</p>
+  </div>
+</section>
+
+<main id="main">
+  <div class="lead-row" id="answers">
+    <h2 class="sec-title">חמש שאלות, חמש תשובות</h2>
+    <div class="tools">
+      <button class="tool" id="openAll" type="button">פתח הכול</button>
+      <button class="tool" id="closeAll" type="button">סגור הכול</button>
+    </div>
+  </div>
+
+  <!-- ===================== Q1 ===================== -->
+  <article class="q" id="q1">
+    <h3><button class="q-head" type="button" aria-expanded="false" aria-controls="p1">
+      <span class="badge" aria-hidden="true">1</span>
+      <span class="q-text"><span class="q-title">ביצועי הסניפים</span>
+      <span class="q-ans">מתמקדים בחיפה: הסניף הגדול ביותר, בשולי הרווח הנמוכים ביותר (27.9% מול 34.3%-34.8%). פוטנציאל של כ-54 אלף ₪ בשנה.</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button></h3>
+    <div class="panel" id="p1" role="region" aria-labelledby="q1"><div class="panel-clip"><div class="panel-in">
+      <p class="brief"><b>בתרגיל:</b> השוו בין הביצועים העסקיים של הסניפים. באיזה סניף הייתם מתמקדים לצורך שיפור, ומדוע?</p>
+
+      <div class="chart" data-chart="stores">
+        <div class="seg" role="group" aria-label="בחירת מדד">
+          <button type="button" data-m="sales" aria-pressed="true">מכירות</button>
+          <button type="button" data-m="margin" aria-pressed="false">שולי רווח</button>
+          <button type="button" data-m="trend" aria-pressed="false">מגמה Q4 מול Q1</button>
+          <button type="button" data-m="upside" aria-pressed="false">פוטנציאל רווח</button>
+        </div>
+        <div class="rows"></div>
+        <p class="note" aria-live="polite"></p>
+      </div>
+
+      <h4>למה חיפה? תמהיל המכירות לפי קטגוריה</h4>
+      <div class="chart" data-chart="mix">
+        <div class="rows"></div>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--purple)"></i>דרי פוד</span>
+          <span><i class="sw" style="background:var(--teal-d)"></i>וט פוד</span>
+          <span><i class="sw" style="background:var(--teal)"></i>חטיפים</span>
+          <span><i class="sw" style="background:var(--lav)"></i>אביזרים, חול, טיפוח וצעצועים</span>
+        </div>
+      </div>
+
+      <p><b>המדדים:</b> גודל (מכירות), איכות (שולי רווח), סל (קבלה ממוצעת), מגמה (רבעון 4 מול 1), ו<b>פוטנציאל רווח</b>: הרווח שהיה נוסף אילו הסניף הרוויח כמו שאר הרשת. חיפה היא הגדולה והיקרה בקבלה, אך שוליה נמוכים ב-6.5 נקודות, והיא היחידה עם פוטנציאל חיובי. 52.9 אלף ₪ מתוך 54.4 נובעים מתמהיל: דרי פוד הוא 80% ממכירותיה (בשאר 50%), ושוליו (23.7%) הנמוכים ברשת. אשדוד היא החלופה (מגמה חלשה, אך שוליים גבוהים): הבעיה בה היא נפח ולא רווחיות.</p>
+
+      <details class="calc"><summary>החישוב צעד אחר צעד</summary><div class="calc-in">
+        <div class="tblwrap"><table class="tbl">
+          <caption>הנתונים שמאחורי הגרף (מכירות ורווח באלפי ₪)</caption>
+          <thead><tr><th>סניף</th><th class="n">מכירות</th><th class="n">רווח</th><th class="n">שולי רווח</th><th class="n">קבלה ממוצעת</th><th class="n">מכירות Q4 מול Q1</th><th class="n">רווח Q4 מול Q1</th><th class="n">פוטנציאל</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td>חיפה</td><td class="n">835.9</td><td class="n">233.4</td><td class="n">27.9%</td><td class="n">267.5</td><td class="n">-1.8%</td><td class="n">+11.0%</td><td class="n">54.4</td></tr>
+            <tr><td>חולון</td><td class="n">704.9</td><td class="n">242.1</td><td class="n">34.3%</td><td class="n">224.8</td><td class="n">+2.5%</td><td class="n">+10.5%</td><td class="n">-12.9</td></tr>
+            <tr><td>ירושלים</td><td class="n">684.2</td><td class="n">234.4</td><td class="n">34.3%</td><td class="n">220.6</td><td class="n">+5.6%</td><td class="n">+17.5%</td><td class="n">-11.7</td></tr>
+            <tr><td>קרית אונו</td><td class="n">669.5</td><td class="n">229.8</td><td class="n">34.3%</td><td class="n">211.7</td><td class="n">+7.5%</td><td class="n">+18.9%</td><td class="n">-11.9</td></tr>
+            <tr><td>אשדוד</td><td class="n">625.6</td><td class="n">217.9</td><td class="n">34.8%</td><td class="n">204.2</td><td class="n">-7.2%</td><td class="n">+4.8%</td><td class="n">-14.7</td></tr>
+          </tbody>
+        </table></div>
+        <ol class="steps">
+          <li>שולי רווח = רווח ÷ מכירות. חיפה: 233.4 ÷ 835.9 = <b>27.9%</b>.</li>
+          <li>שולי שאר הרשת = (1,157.6 − 233.4) ÷ (3,520.1 − 835.9) = 924.2 ÷ 2,684.2 = <b>34.4%</b>.</li>
+          <li>פוטנציאל = מכירות חיפה × (34.4% − 27.9%) = 835.9 × 6.5% ≈ <b>54.4</b>. בסניפים האחרים התוצאה שלילית.</li>
+          <li>פירוק: השפעת תמהיל <b>52.9</b> + השפעת שוליים בתוך קטגוריה <b>1.5</b> = 54.4. תרומת קטגוריה = מכירות חיפה × (משקל שאר הרשת − משקל חיפה) × שולי חיפה בקטגוריה:</li>
+        </ol>
+        <div class="tblwrap"><table class="tbl">
+          <thead><tr><th>קטגוריה</th><th class="n">משקל בחיפה</th><th class="n">משקל בשאר הרשת</th><th class="n">שולי חיפה</th><th class="n">תרומה</th></tr></thead>
+          <tbody>
+            <tr><td>דרי פוד</td><td class="n">79.6%</td><td class="n">50.0%</td><td class="n">23.5%</td><td class="n">-58.2</td></tr>
+            <tr><td>וט פוד</td><td class="n">7.8%</td><td class="n">22.3%</td><td class="n">37.7%</td><td class="n">+45.5</td></tr>
+            <tr><td>חטיפים</td><td class="n">4.9%</td><td class="n">14.0%</td><td class="n">56.0%</td><td class="n">+42.7</td></tr>
+            <tr><td>אביזרים</td><td class="n">2.4%</td><td class="n">4.4%</td><td class="n">48.5%</td><td class="n">+8.1</td></tr>
+            <tr><td>חול</td><td class="n">2.1%</td><td class="n">3.4%</td><td class="n">44.2%</td><td class="n">+4.9</td></tr>
+            <tr><td>טיפוח</td><td class="n">1.6%</td><td class="n">3.0%</td><td class="n">41.9%</td><td class="n">+5.1</td></tr>
+            <tr><td>צעצועים</td><td class="n">1.6%</td><td class="n">2.8%</td><td class="n">46.2%</td><td class="n">+4.8</td></tr>
+          </tbody>
+          <tfoot><tr><td>סה"כ (השפעת תמהיל)</td><td class="n">100%</td><td class="n">100%</td><td class="n"></td><td class="n">+52.9</td></tr></tfoot>
+        </table></div>
+      </div></details>
+    </div></div></div>
+  </article>
+
+  <!-- ===================== Q2 ===================== -->
+  <article class="q" id="q2">
+    <h3><button class="q-head" type="button" aria-expanded="false" aria-controls="p2">
+      <span class="badge" aria-hidden="true">2</span>
+      <span class="q-text"><span class="q-title">ממוצע וחציון של סכום קבלה</span>
+      <span class="q-ans">ממוצע 225.8 ₪, חציון 186.5 ₪: התפלגות מוטה ימינה. השילוב של גודל סל, נוכחות דרי פוד וקניות בכמות גדולה מסביר 66% מהפער.</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button></h3>
+    <div class="panel" id="p2" role="region" aria-labelledby="q2"><div class="panel-clip"><div class="panel-in">
+      <p class="brief"><b>בתרגיל:</b> חשבו ממוצע וחציון של סכום הקבלה. מה אומר הפער? מה יכול להסביר אותו, וכיצד תבדקו? על איזו שאלה עסקית כל מדד עונה?</p>
+
+      <p>מ-15,588 קבלות: ממוצע <b>225.8 ₪</b>, חציון <b>186.5 ₪</b>, פער <b>39.3 ₪</b> (21%). ההתפלגות מוטה ימינה: 61% מהקבלות מתחת לממוצע, והעשירון העליון הוא 27% מהמכירות. מעטות קבלות גדולות מושכות את הממוצע למעלה.</p>
+
+      <h4>הבדיקה: כמה מהפער נשאר בין קבלות דומות</h4>
+      <div class="chart" data-chart="gap">
+        <div class="rows"></div>
+        <p class="note" aria-live="polite">העבירו עכבר או התמקדו בשורה כדי לראות כמה מהפער הוסר.</p>
+      </div>
+      <p>הפער נובע בעיקר מערבוב קבלות בגדלים שונים, עם ובלי דרי פוד יקר, ובמידה פחותה מקניות בכמות גדולה (77 קבלות, 5.1% מהמכירות). <b>השערה שלא נבדקה:</b> הפער שנותר (13 ₪) נובע מפיזור מחירי המוצרים (5-230 ₪).</p>
+
+      <div class="two">
+        <div><h4>הממוצע עונה על</h4><p>כמה הכנסה מניבה קבלה בממוצע: תחזית הכנסות ותכנון.</p></div>
+        <div><h4>החציון עונה על</h4><p>מהי הקבלה הטיפוסית של הלקוח: סף משלוח חינם, מבצע סל.</p></div>
+      </div>
+
+      <details class="calc"><summary>החישוב צעד אחר צעד</summary><div class="calc-in">
+        <ol class="steps">
+          <li>סכום קבלה = סכום <span class="ltr">LineSales</span> של שורותיה. ממוצע = 3,520,100 ÷ 15,588 = <b>225.8</b>. חציון = הקבלה האמצעית בסדר עולה = <b>186.5</b>.</li>
+          <li>בודקים הסבר כך: מחשבים ממוצע פחות חציון בתוך קבוצות של קבלות דומות, ומשקללים לפי מספר הקבלות בקבוצה. אם ההסבר נכון, הפער בתוך הקבוצה קטן.</li>
+          <li>ללא 77 קבלות עם שורה בכמות 20 ומעלה: ממוצע 214.7, חציון 185.7, פער <b>29.0</b> (הוסר 26%).</li>
+          <li>אותו מספר שורות בקבלה:</li>
+        </ol>
+        <div class="tblwrap"><table class="tbl">
+          <thead><tr><th>שורות</th><th class="n">קבלות</th><th class="n">ממוצע</th><th class="n">חציון</th><th class="n">פער</th></tr></thead>
+          <tbody>
+            <tr><td>2</td><td class="n">8,616</td><td class="n">170.5</td><td class="n">139.1</td><td class="n">31.4</td></tr>
+            <tr><td>3</td><td class="n">4,159</td><td class="n">250.6</td><td class="n">219.3</td><td class="n">31.3</td></tr>
+            <tr><td>4</td><td class="n">2,148</td><td class="n">339.2</td><td class="n">302.5</td><td class="n">36.8</td></tr>
+            <tr><td>5</td><td class="n">665</td><td class="n">421.3</td><td class="n">391.8</td><td class="n">29.5</td></tr>
+          </tbody>
+          <tfoot><tr><td>פער משוקלל</td><td class="n">15,588</td><td class="n"></td><td class="n"></td><td class="n">32.0 (הוסר 18%)</td></tr></tfoot>
+        </table></div>
+        <ol class="steps" start="5"><li>אותו מספר שורות <b>ואותה נוכחות של דרי פוד</b> (הקטגוריה עם ערך השורה הממוצע הגבוה ביותר), ללא קבלות עם כמות חריגה:</li></ol>
+        <div class="tblwrap"><table class="tbl">
+          <thead><tr><th>דרי פוד בקבלה</th><th class="n">שורות</th><th class="n">קבלות</th><th class="n">ממוצע</th><th class="n">חציון</th><th class="n">פער</th></tr></thead>
+          <tbody>
+            <tr><td>לא</td><td class="n">2</td><td class="n">4,243</td><td class="n">103.5</td><td class="n">94.2</td><td class="n">9.3</td></tr>
+            <tr><td>לא</td><td class="n">3</td><td class="n">1,501</td><td class="n">154.4</td><td class="n">144.1</td><td class="n">10.3</td></tr>
+            <tr><td>לא</td><td class="n">4</td><td class="n">577</td><td class="n">210.2</td><td class="n">200.4</td><td class="n">9.8</td></tr>
+            <tr><td>לא</td><td class="n">5</td><td class="n">120</td><td class="n">272.4</td><td class="n">264.5</td><td class="n">7.9</td></tr>
+            <tr><td>כן</td><td class="n">2</td><td class="n">4,334</td><td class="n">216.7</td><td class="n">201.7</td><td class="n">15.0</td></tr>
+            <tr><td>כן</td><td class="n">3</td><td class="n">2,635</td><td class="n">287.8</td><td class="n">270.1</td><td class="n">17.7</td></tr>
+            <tr><td>כן</td><td class="n">4</td><td class="n">1,561</td><td class="n">366.2</td><td class="n">349.3</td><td class="n">16.9</td></tr>
+            <tr><td>כן</td><td class="n">5</td><td class="n">540</td><td class="n">438.2</td><td class="n">427.9</td><td class="n">10.3</td></tr>
+          </tbody>
+          <tfoot><tr><td>פער משוקלל</td><td class="n"></td><td class="n">15,511</td><td class="n"></td><td class="n"></td><td class="n">13.2 (הוסר 66%)</td></tr></tfoot>
+        </table></div>
+      </div></details>
+    </div></div></div>
+  </article>
+
+  <!-- ===================== Q3 ===================== -->
+  <article class="q" id="q3">
+    <h3><button class="q-head" type="button" aria-expanded="false" aria-controls="p3">
+      <span class="badge" aria-hidden="true">3</span>
+      <span class="q-text"><span class="q-title">שינוי לאורך זמן: רבעון 1 מול רבעון 4</span>
+      <span class="q-ans">המכירות כמעט ללא שינוי (+1.2%) אך הרווח עלה ב-12.5%: מעבר מדרי פוד (-27.6%) לווט פוד (+133%) וחטיפים (+41.8%).</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button></h3>
+    <div class="panel" id="p3" role="region" aria-labelledby="q3"><div class="panel-clip"><div class="panel-in">
+      <p class="brief"><b>בתרגיל:</b> השוו את מכירות הקטגוריות ברבעון הראשון וברבעון הרביעי. מהם השינויים הבולטים? הציגו חישוב והסבירו את המשמעות העסקית.</p>
+
+      <div class="chart" data-chart="cats">
+        <div class="seg" role="group" aria-label="בחירת מדד">
+          <button type="button" data-m="sales" aria-pressed="true">מכירות</button>
+          <button type="button" data-m="profit" aria-pressed="false">רווח גולמי</button>
+        </div>
+        <div class="rows"></div>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--lav)"></i>רבעון 1</span>
+          <span><i class="sw" style="background:var(--purple)"></i>רבעון 4</span>
+          <span>באלפי ₪, כלל הרשת</span>
+        </div>
+      </div>
+
+      <p>סך המכירות כמעט ללא שינוי (896.0 ל-906.5 אלף ₪, <b>+1.2%</b>), אך הרווח הגולמי עלה מ-277.7 ל-312.4 (<b>+12.5%</b>; שולי הרווח מ-31.0% ל-34.5%). <b>המשמעות העסקית:</b> שולי כל קטגוריה יציבים, ולכן העלייה נובעת מהמעבר מדרי פוד (שוליים 24%) לווט פוד (38%) וחטיפים (56%), ולא מתמחור. הרשת מרוויחה יותר על אותן הכנסות, וכדאי לקדם את הקטגוריות הרווחיות בכל הסניפים, ובעיקר בסניף שמפגר אחר המגמה (שאלה 4).</p>
+
+      <details class="calc"><summary>החישוב צעד אחר צעד</summary><div class="calc-in">
+        <ol class="steps">
+          <li>מכירות קטגוריה ברבעון = סכום <span class="ltr">LineSales</span> בחודשים 1-3 (רבעון 1) ו-10-12 (רבעון 4).</li>
+          <li>שינוי % = מכירות Q4 ÷ מכירות Q1 − 1. וט פוד: 236.2 ÷ 101.4 − 1 = <b>+133%</b>.</li>
+          <li>שולי רווח = רווח ÷ מכירות בכל רבעון: בכל קטגוריה כמעט זהים, ולכן הרווח השתנה בגלל התמהיל.</li>
+        </ol>
+        <div class="tblwrap"><table class="tbl">
+          <caption>באלפי ₪, כלל הרשת</caption>
+          <thead><tr><th>קטגוריה</th><th class="n">מכירות Q1</th><th class="n">מכירות Q4</th><th class="n">שינוי</th><th class="n">%</th><th class="n">רווח Q1</th><th class="n">רווח Q4</th><th class="n">שוליים Q1</th><th class="n">שוליים Q4</th></tr></thead>
+          <tbody>
+            <tr><td>דרי פוד</td><td class="n">603.3</td><td class="n">436.8</td><td class="n">-166.5</td><td class="n">-27.6%</td><td class="n">143.1</td><td class="n">103.5</td><td class="n">23.7%</td><td class="n">23.7%</td></tr>
+            <tr><td>וט פוד</td><td class="n">101.4</td><td class="n">236.2</td><td class="n">+134.8</td><td class="n">+133.0%</td><td class="n">38.4</td><td class="n">89.7</td><td class="n">37.9%</td><td class="n">38.0%</td></tr>
+            <tr><td>חטיפים</td><td class="n">86.9</td><td class="n">123.2</td><td class="n">+36.3</td><td class="n">+41.8%</td><td class="n">48.8</td><td class="n">69.2</td><td class="n">56.2%</td><td class="n">56.2%</td></tr>
+            <tr><td>אביזרים</td><td class="n">32.3</td><td class="n">35.8</td><td class="n">+3.5</td><td class="n">+10.9%</td><td class="n">15.6</td><td class="n">17.3</td><td class="n">48.3%</td><td class="n">48.4%</td></tr>
+            <tr><td>צעצועים</td><td class="n">25.2</td><td class="n">21.3</td><td class="n">-3.8</td><td class="n">-15.2%</td><td class="n">11.5</td><td class="n">9.8</td><td class="n">45.8%</td><td class="n">46.0%</td></tr>
+            <tr><td>חול</td><td class="n">24.8</td><td class="n">28.0</td><td class="n">+3.2</td><td class="n">+13.0%</td><td class="n">10.9</td><td class="n">12.4</td><td class="n">44.2%</td><td class="n">44.1%</td></tr>
+            <tr><td>טיפוח</td><td class="n">22.2</td><td class="n">25.1</td><td class="n">+3.0</td><td class="n">+13.3%</td><td class="n">9.2</td><td class="n">10.5</td><td class="n">41.7%</td><td class="n">41.6%</td></tr>
+          </tbody>
+          <tfoot><tr><td>סה"כ</td><td class="n">896.0</td><td class="n">906.5</td><td class="n">+10.5</td><td class="n">+1.2%</td><td class="n">277.7</td><td class="n">312.4</td><td class="n">31.0%</td><td class="n">34.5%</td></tr></tfoot>
+        </table></div>
+      </div></details>
+    </div></div></div>
+  </article>
+
+  <!-- ===================== Q4 ===================== -->
+  <article class="q" id="q4">
+    <h3><button class="q-head" type="button" aria-expanded="false" aria-controls="p4">
+      <span class="badge" aria-hidden="true">4</span>
+      <span class="q-text"><span class="q-title">חקירה פתוחה: הפער בחיפה</span>
+      <span class="q-ans">ההבדל הוא בסניף ולא בלקוחות: אותם 1,294 לקוחות קונים 79% דרי פוד בחיפה ו-50% בשאר הרשת.</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button></h3>
+    <div class="panel" id="p4" role="region" aria-labelledby="q4"><div class="panel-clip"><div class="panel-in">
+      <p class="brief"><b>בתרגיל:</b> בחרו פער ביצועים או מגמה חשובים, חקרו מה עשוי להסביר אותם, והבהירו מה בדקתם, מה מצאתם ומה עדיין בגדר השערה.</p>
+      <p>הממצא שנבחר: שולי הרווח של חיפה נמוכים בגלל תמהיל. בדקתי מה עומד מאחורי זה, השערה אחת בכל פעם:</p>
+
+      <div class="three">
+        <section>
+          <h4>מה בדקתי</h4>
+          <ul>
+            <li>תמחור והנחות</li>
+            <li>גודל הסל</li>
+            <li>תמהיל הקבלות</li>
+            <li>האם הלקוחות שונים</li>
+            <li>האם זה פריט בודד או רחב</li>
+            <li>האם חיפה מפגרת במגמת הרשת</li>
+          </ul>
+        </section>
+        <section class="found">
+          <h4>מה מצאתי</h4>
+          <ul>
+            <li>מחיר כל פריט זהה בכל הסניפים וההנחה 1.5%-1.8%: <b>לא תמחור</b>. 2.67 שורות לקבלה בכולם: <b>לא גודל סל</b></li>
+            <li>תמהיל: דרי פוד ב-87% מהקבלות בחיפה (51% בשאר)</li>
+            <li><b>אותם 1,294 לקוחות קונים אחרת בחיפה:</b> דרי פוד הוא 79.4% מקניותיהם בחיפה לעומת 49.7% בשאר הרשת. ההסבר בסניף ולא בלקוחות</li>
+            <li>בכל 48 פריטי הוט פוד והחטיפים נמכר בחיפה פחות מהצפוי (חציון 40%)</li>
+            <li>משקל הוט פוד בחיפה עלה מ-3% ל-13% בשנה, בשאר מ-14% ל-30%</li>
+          </ul>
+        </section>
+        <section class="hyp">
+          <h4>מה עדיין השערה</h4>
+          <ul>
+            <li>הסיבה בסניף: זמינות מלאי, שטח מדף או שיווק של וט פוד וחטיפים</li>
+            <li>בנתונים אין מלאי, מדפים או מבצעים, ולכן אי אפשר להכריע</li>
+            <li>הצעד הבא: לבדוק מול הסניף</li>
+          </ul>
+        </section>
+      </div>
+
+      <h4>שיעור הקבלות שכוללות כל קטגוריה</h4>
+      <div class="chart" data-chart="attach">
+        <div class="rows"></div>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--purple);border-radius:50%"></i>חיפה</span>
+          <span><i class="sw" style="background:var(--teal-d);border-radius:50%"></i>שאר הרשת (מצטבר)</span>
+        </div>
+      </div>
+
+      <details class="calc"><summary>החישוב צעד אחר צעד</summary><div class="calc-in">
+        <ol class="steps">
+          <li>שיעור קבלות עם קטגוריה = קבלות עם שורה בקטגוריה ÷ כל קבלות הסניף. "שאר הרשת" מחושב מצטבר על קבלות ארבעת הסניפים האחרים, ולא כממוצע סניפים.</li>
+        </ol>
+        <div class="tblwrap"><table class="tbl">
+          <thead><tr><th>קטגוריה</th><th class="n">חיפה (מתוך 3,125)</th><th class="n">%</th><th class="n">שאר הרשת (מתוך 12,463)</th><th class="n">%</th></tr></thead>
+          <tbody>
+            <tr><td>דרי פוד</td><td class="n">2,720</td><td class="n">87.0%</td><td class="n">6,399</td><td class="n">51.3%</td></tr>
+            <tr><td>וט פוד</td><td class="n">1,222</td><td class="n">39.1%</td><td class="n">8,293</td><td class="n">66.5%</td></tr>
+            <tr><td>חטיפים</td><td class="n">761</td><td class="n">24.4%</td><td class="n">5,792</td><td class="n">46.5%</td></tr>
+          </tbody>
+        </table></div>
+        <ol class="steps" start="2">
+          <li><b>תמחור:</b> מספר מחירי היחידה השונים לכל קוד פריט לאורך השנה הוא 1 בכל הסניפים. שיעור הנחה = סכום הנחות ÷ (כמות × מחיר): 1.5%-1.8%.</li>
+          <li><b>גודל סל:</b> שורות לקבלה: 2.67 בחיפה, 2.66-2.68 בשאר.</li>
+          <li><b>לקוחות:</b> 1,599 לקוחות מזוהים, 99.4% מהם קנו ביותר מסניף אחד; ל-1,294 יש קניות בחיפה ובסניף אחר. משקל דרי פוד = מכירות דרי פוד ÷ כל מכירותיהם: בחיפה 551.8 ÷ 695.0 = <b>79.4%</b>; בשאר 897.5 ÷ 1,804.0 = <b>49.7%</b> (אלפי ₪).</li>
+          <li><b>רוחב:</b> לכל אחד מ-48 פריטי הוט פוד והחטיפים: יחידות בחיפה ÷ (יחידות בארבעת הסניפים האחרים ÷ 4). חציון 0.40, טווח 0.21-0.77.</li>
+        </ol>
+      </div></details>
+    </div></div></div>
+  </article>
+
+  <!-- ===================== Q5 ===================== -->
+  <article class="q" id="q5">
+    <h3><button class="q-head" type="button" aria-expanded="false" aria-controls="p5">
+      <span class="badge" aria-hidden="true">5</span>
+      <span class="q-text"><span class="q-title">המלצות ומדדי KPI</span>
+      <span class="q-ans">עדיפות ראשונה: להגדיל בחיפה את הוט פוד והחטיפים (כ-53 אלף ₪ בשנה). שנייה: לחסום מכירה מתחת לעלות (כ-8 אלף ₪).</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button></h3>
+    <div class="panel" id="p5" role="region" aria-labelledby="q5"><div class="panel-clip"><div class="panel-in">
+      <p class="brief"><b>בתרגיל:</b> המליצו על שתי פעולות מעשיות. לכל פעולה הגדירו KPI (חישוב, מצב התחלתי, כיוון, תדירות), ונמקו איזו תקבל עדיפות.</p>
+
+      <div class="tblwrap"><table class="tbl">
+        <thead><tr><th></th><th>פעולה 1 (עדיפות)</th><th>פעולה 2</th></tr></thead>
+        <tbody>
+          <tr><th>הפעולה</th><td>להגדיל בחיפה את הנוכחות של וט פוד וחטיפים: מלאי, מדף, מבצעי סל</td><td>לחסום במסוף מכירה מתחת לעלות, ולתקן נתוני עלות שגויים</td></tr>
+          <tr><th>KPI וחישובו</th><td>% הקבלות בחיפה עם וט פוד, ועם חטיפים (קבלות עם הקטגוריה ÷ כל קבלות הסניף)</td><td>מספר שורות מכירה שבהן <span class="ltr">LineSales &lt; LineCost</span></td></tr>
+          <tr><th>מצב התחלתי</th><td>39.1% וט פוד, 24.4% חטיפים</td><td>19.5 שורות בחודש (234 בשנה, הפסד 8.4 אלף ₪)</td></tr>
+          <tr><th>כיוון ותדירות</th><td>עלייה, בדיקה חודשית</td><td>ירידה, בדיקה חודשית</td></tr>
+          <tr><th>יעד ונימוקו</th><td>התקרבות לשאר הרשת (66.5% / 46.5%): ערכים שהרשת כבר משיגה באותם מוצרים ולקוחות</td><td>אפס שורות שנגרמו מהנחה גדולה מהמחיר: אין סיבה עסקית למכור מתחת לעלות; 104 שורות הן טעויות עלות לתיקון במקור</td></tr>
+        </tbody>
+      </table></div>
+
+      <h4>למה פעולה 1 מקבלת עדיפות: הפוטנציאל הכספי בשנה</h4>
+      <div class="chart" data-chart="priority"><div class="rows"></div></div>
+
+      <details class="calc"><summary>החישוב צעד אחר צעד</summary><div class="calc-in">
+        <ol class="steps">
+          <li><b>KPI 1:</b> וט פוד בחיפה: 1,222 ÷ 3,125 = <b>39.1%</b>; חטיפים: 761 ÷ 3,125 = <b>24.4%</b>. שאר הרשת: 8,293 ÷ 12,463 = 66.5% ו-5,792 ÷ 12,463 = 46.5%.</li>
+          <li><b>KPI 2:</b> שורות מכירה (כמות חיובית) עם <span class="ltr">LineSales &lt; LineCost</span>: 130 שורות שנמכרו בהנחה שווה למחיר או גדולה ממנו + 104 שורות שהעלות בהן גבוהה מהמחיר = <b>234 בשנה</b>; 234 ÷ 12 = <b>19.5 בחודש</b>. הפסד = סכום (<span class="ltr">LineSales − LineCost</span>) באותן שורות = −8,448 ₪.</li>
+          <li><b>עדיפות:</b> פעולה 1: השפעת תמהיל 52.9 אלף ₪ בשנה (שאלה 1); פעולה 2: הפסד שנתי 8.4 אלף ₪. יחס של כ-6:1.</li>
+        </ol>
+      </div></details>
+    </div></div></div>
+  </article>
+
+  <!-- ===================== data quality, calculations, AI ===================== -->
+  <h2 class="group-title">איכות נתונים, חישובים תומכים ושימוש ב-AI</h2>
+
+  <article class="q" id="data-quality">
+    <h3><button class="q-head" type="button" aria-expanded="false" aria-controls="p6">
+      <span class="badge" aria-hidden="true">+</span>
+      <span class="q-text"><span class="q-title">בדיקת איכות הנתונים והנחות</span>
+      <span class="q-ans">59 שורות כפולות הוסרו (0.16% מהמכירות, בלי השפעה על דירוג הסניפים); 104 שורות עם עלות חריגה סומנו.</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button></h3>
+    <div class="panel" id="p6" role="region" aria-labelledby="data-quality"><div class="panel-clip"><div class="panel-in">
+      <p><b>מה נבדק:</b> כפילויות במפתח השורה (<span class="ltr">StoreCode + BillNum + LineNum</span>); עקביות פנימית (<span class="ltr">LineSales = כמות × מחיר − הנחה</span> ו-<span class="ltr">LineCost = כמות × עלות</span>, ללא חריגות); עקביות מחיר לכל קוד פריט; חריגי כמות, הנחה ועלות; מזהי לקוח חסרים. כל בדיקה נספרה בקוד, בלי לתקן רשומות בשקט.</p>
+      <div class="tblwrap"><table class="tbl">
+        <thead><tr><th>בעיה</th><th class="n">היקף</th><th>טיפול</th><th>השפעה על התוצאות</th></tr></thead>
+        <tbody>
+          <tr><td>שורות כפולות (אותם סניף, קבלה ושורה)</td><td class="n">59 שורות, 5,550 ₪</td><td>הוסרו</td><td>זניחה (0.16%); דירוג הסניפים לא השתנה</td></tr>
+          <tr><td>עלות יחידה גבוהה ממחיר המכירה (פי 1.4-2.5 מהעלות הרגילה, כנראה טעות רישום)</td><td class="n">104 שורות</td><td>סומנו, לא תוקנו</td><td>כ-0.3% מהרווח</td></tr>
+          <tr><td>הנחה שווה למחיר או גדולה ממנו</td><td class="n">130 שורות</td><td>סומנו, לא תוקנו</td><td>זניחה; נספרות ב-KPI של פעולה 2</td></tr>
+          <tr><td>החזרות (כמות שלילית)</td><td class="n">72 שורות</td><td>נשארו (מכירה נטו)</td><td>-4.9 אלף ₪</td></tr>
+          <tr><td>כמות 20-45 יחידות</td><td class="n">77 שורות, 5.1% מהמכירות</td><td>נשארו (לגיטימיות)</td><td>נבדקה רגישות בשאלה 2</td></tr>
+          <tr><td>לקוח לא מזוהה (<span class="ltr">CustomerCode = 0</span>)</td><td class="n">16% מהמכירות</td><td>קבוצה נפרדת</td><td>אינה משפיעה על המכירות</td></tr>
+        </tbody>
+      </table></div>
+      <h4>הנחות ושינויים מהותיים</h4>
+      <ul>
+        <li>קבלה = <span class="ltr">StoreCode + BillNum</span>; <span class="ltr">LineSales</span> כבר נטו אחרי הנחה, ולכן רווח = <span class="ltr">LineSales − LineCost</span>.</li>
+        <li><span class="ltr">SalesChannel</span> רשום לשורה ולא לקבלה (2,980 קבלות מכילות שני ערוצים), ולכן אין "ערוץ של קבלה".</li>
+        <li>סף "כמות חריגה" = 20 יחידות: הכמות הרגילה 1-2, ויש פער עד 20.</li>
+      </ul>
+    </div></div></div>
+  </article>
+
+  <article class="q" id="calcs">
+    <h3><button class="q-head" type="button" aria-expanded="false" aria-controls="p8">
+      <span class="badge" aria-hidden="true">+</span>
+      <span class="q-text"><span class="q-title">חישובים תומכים: איפה עוקבים אחרי המספרים</span>
+      <span class="q-ans">לכל שאלה: החישוב בדף, טבלת CSV, גיליון Excel עם נוסחאות חיות, שאילתת SQL והפונקציה בקוד.</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button></h3>
+    <div class="panel" id="p8" role="region" aria-labelledby="calcs"><div class="panel-clip"><div class="panel-in">
+      <p>בכל שאלה בלוק "החישוב צעד אחר צעד" עם הנוסחאות והמספרים הביניים. אותם מספרים מחושבים בשלוש דרכים עצמאיות (Python, SQL, נוסחאות Excel) והושוו בבדיקות אוטומטיות.</p>
+      <div class="dl">
+        <a class="pill pill-solid" href="calculations/DataMoments_Analyst_Calculations.xlsx" download>הורדת קובץ החישובים (Excel)</a>
+        <a class="pill pill-line" href="https://github.com/OfekBP/data-analyst-data-moments" target="_blank" rel="noopener">הקוד ב-GitHub</a>
+      </div>
+      <div class="tblwrap"><table class="tbl">
+        <thead><tr><th>שאלה</th><th>טבלאות CSV</th><th>גיליון Excel</th><th>SQL</th></tr></thead>
+        <tbody>
+          <tr><td>1. סניפים</td><td><a href="calculations/tables/q1_stores.csv">q1_stores</a> · <a href="calculations/tables/q1_category_mix_gap.csv">q1_category_mix_gap</a></td><td><span class="ltr">Q1_Stores</span></td><td><a href="https://github.com/OfekBP/data-analyst-data-moments/blob/main/sql/q1_stores.sql" target="_blank" rel="noopener">q1_stores.sql</a></td></tr>
+          <tr><td>2. ממוצע וחציון</td><td><a href="calculations/tables/q2_gap_explanations.csv">q2_gap_explanations</a> · <a href="calculations/tables/q2_avg_receipt_by_lines.csv">q2_avg_receipt_by_lines</a></td><td><span class="ltr">Q2_MeanMedian</span></td><td><a href="https://github.com/OfekBP/data-analyst-data-moments/blob/main/sql/q2_receipt_mean_median.sql" target="_blank" rel="noopener">q2_receipt_mean_median.sql</a></td></tr>
+          <tr><td>3. רבעון 1 מול 4</td><td><a href="calculations/tables/q3_category_q1_vs_q4.csv">q3_category_q1_vs_q4</a></td><td><span class="ltr">Q3_Categories</span></td><td><a href="https://github.com/OfekBP/data-analyst-data-moments/blob/main/sql/q3_category_q1_vs_q4.sql" target="_blank" rel="noopener">q3_category_q1_vs_q4.sql</a></td></tr>
+          <tr><td>4. חקירה</td><td><a href="calculations/tables/q4_attach_rates.csv">q4_attach_rates</a> · <a href="calculations/tables/q4_rest_of_chain_attach_rates.csv">q4_rest_of_chain</a> · <a href="calculations/tables/q4_common_customers_mix.csv">q4_common_customers</a></td><td><span class="ltr">Q4_Investigation</span></td><td><a href="https://github.com/OfekBP/data-analyst-data-moments/blob/main/sql/q4_attach_rates.sql" target="_blank" rel="noopener">q4_attach_rates.sql</a></td></tr>
+          <tr><td>5. KPI</td><td><a href="calculations/tables/q5_kpis.csv">q5_kpis</a></td><td><span class="ltr">Q5_KPIs</span></td><td>Python ובדף זה</td></tr>
+        </tbody>
+      </table></div>
+      <p class="src">בקובץ ה-Excel גיליון <span class="ltr">Checks</span> מציב כל תוצאה של נוסחה ליד התוצאה ב-Python (הפרשים 0). הנוסחאות חיות: שינוי מספר בגיליון <span class="ltr">Data</span> מעדכן את כל הגיליונות.</p>
+    </div></div></div>
+  </article>
+
+  <article class="q" id="ai">
+    <h3><button class="q-head" type="button" aria-expanded="false" aria-controls="p7">
+      <span class="badge" aria-hidden="true">+</span>
+      <span class="q-text"><span class="q-title">שימוש ב-AI ואימות התוצאות</span>
+      <span class="q-ans">נעזרתי ב-Claude; כל תוצאה מרכזית חושבה בשלוש דרכים והושוותה בבדיקות אוטומטיות.</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button></h3>
+    <div class="panel" id="p7" role="region" aria-labelledby="ai"><div class="panel-clip"><div class="panel-in">
+      <p><b>איך נעזרתי:</b> ב-Claude לאיתור ממצאים, לכתיבת הקוד, השאילתות וקובץ ה-Excel, ולבניית דף זה.</p>
+      <p><b>איך אימתתי:</b></p>
+      <ul>
+        <li>כל תוצאה מרכזית חושבה ב-Python (pandas), ב-SQL (SQLite) ובנוסחאות Excel, והושוותה בבדיקות אוטומטיות (<span class="ltr">python -m pytest</span>).</li>
+        <li>הסכומים וחישובי שאלה 2 נבדקו גם בחישוב עצמאי על הקובץ הגולמי, בלי קוד הפרויקט.</li>
+        <li>הממצא המרכזי בשאלה 4 נבדק ברמת הלקוח הבודד ולא רק באגרגציה, והפרויקט רץ מ-clone נקי ומניב אותן תוצאות.</li>
+      </ul>
+      <p><b>מגבלה:</b> בדיקת הלקוחות המשותפים (שאלה 4) נעשתה ב-Python בלבד, בלי SQL ובלי נוסחה ב-Excel.</p>
+    </div></div></div>
+  </article>
+</main>
+
+<section class="cta-band" aria-label="קישורים">
+  <div class="cta-in">
+    <div>
+      <h2>רוצים לעקוב אחרי כל מספר?</h2>
+      <p>הקוד, השאילתות, הבדיקות וקובץ ה-Excel פתוחים לעיון.</p>
+    </div>
+    <div class="acts">
+      <a class="pill pill-solid" href="https://github.com/OfekBP/data-analyst-data-moments" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        לקוד ב-GitHub
+      </a>
+      <a class="pill pill-line" href="calculations/DataMoments_Analyst_Calculations.xlsx" download>קובץ Excel</a>
+      <a class="pill pill-line" href="https://github.com/OfekBP/data-analyst-data-moments/blob/main/docs/answers.md" target="_blank" rel="noopener">הגרסה הכתובה (2 עמודים)</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot">
+    <span>הגשה: Ofek Ben Porat · תרגיל חשיבה עסקית לאנליסט נתונים בחברת Data Moments · נתוני 2025 סינתטיים</span>
+    <a href="https://github.com/OfekBP/data-analyst-data-moments" target="_blank" rel="noopener">github.com/OfekBP/data-analyst-data-moments</a>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add('js');
+
+/* Static numbers, typed from the analysis (docs/answers.md). They deliberately
+   do NOT update when the data changes. */
+const DATA = {
+  stores: [
+    {n:'חיפה', f:1, sales:835.9, margin:27.9, trend:-1.8, upside:54.4},
+    {n:'חולון', sales:704.9, margin:34.3, trend:2.5, upside:-12.9},
+    {n:'ירושלים', sales:684.2, margin:34.3, trend:5.6, upside:-11.7},
+    {n:'קרית אונו', sales:669.5, margin:34.3, trend:7.5, upside:-11.9},
+    {n:'אשדוד', sales:625.6, margin:34.8, trend:-7.2, upside:-14.7}
+  ],
+  mix: [
+    {n:'חיפה', parts:[79.6,7.8,4.9,7.7]},
+    {n:'שאר הרשת', parts:[50.0,22.3,14.0,13.7]}
+  ],
+  gap: [
+    {l:'כל הקבלות', v:39.3, rm:0},
+    {l:'ללא 77 קבלות עם כמות חריגה', v:29.0, rm:26},
+    {l:'אותו מספר שורות בקבלה', v:32.0, rm:18},
+    {l:'אותו מספר שורות ואותה נוכחות דרי פוד, ללא חריגות', v:13.2, rm:66}
+  ],
+  cats: [
+    {n:'דרי פוד', s1:603.3, s4:436.8, p1:143.1, p4:103.5, ds:-27.6, dp:-39.6},
+    {n:'וט פוד', s1:101.4, s4:236.2, p1:38.4, p4:89.7, ds:133.0, dp:51.3},
+    {n:'חטיפים', s1:86.9, s4:123.2, p1:48.8, p4:69.2, ds:41.8, dp:20.4},
+    {n:'אביזרים', s1:32.3, s4:35.8, p1:15.6, p4:17.3, ds:10.9, dp:1.7},
+    {n:'צעצועים', s1:25.2, s4:21.3, p1:11.5, p4:9.8, ds:-15.2, dp:-1.7},
+    {n:'חול', s1:24.8, s4:28.0, p1:10.9, p4:12.4, ds:13.0, dp:1.4},
+    {n:'טיפוח', s1:22.2, s4:25.1, p1:9.2, p4:10.5, ds:13.3, dp:1.2}
+  ],
+  attach: [
+    {n:'דרי פוד', h:87.0, r:51.3},
+    {n:'וט פוד', h:39.1, r:66.5},
+    {n:'חטיפים', h:24.4, r:46.5}
+  ],
+  priority: [
+    {n:'פעולה 1: תמהיל וט פוד וחטיפים בחיפה', v:52.9, f:1},
+    {n:'פעולה 2: מכירה מתחת לעלות', v:8.4}
+  ]
+};
+
+const f1 = v => v.toLocaleString('he-IL',{minimumFractionDigits:1,maximumFractionDigits:1});
+const sign = v => (v>0?'+':v<0?'-':'') + f1(Math.abs(v));
+
+const NOTES = {
+  sales: 'חיפה היא הסניף הגדול ברשת: 23.7% מהמכירות.',
+  margin: 'שולי הרווח של חיפה נמוכים ב-6.5 נקודות מהממוצע של שאר הרשת (הקו המקווקו, 34.4%).',
+  trend: 'אשדוד בירידה החדה ביותר (7.2%-), חיפה ב-1.8%-. לשאר הסניפים יש צמיחה.',
+  upside: 'רק לחיפה פוטנציאל חיובי: כ-54 אלף ₪ בשנה אילו הרוויחה כמו שאר הרשת (באלפי ₪).'
+};
+const STORE_METRICS = {
+  sales:  {fmt:v=>f1(v)+' אלף ₪', min:0, max:900},
+  margin: {fmt:v=>f1(v)+'%', min:0, max:40, ref:34.4},
+  trend:  {fmt:v=>sign(v)+'%', min:-10, max:10},
+  upside: {fmt:v=>sign(v)+' אלף ₪', min:-20, max:60}
+};
+
+function el(tag, cls, html){const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e}
+function pos(v,min,max){return (v-min)/(max-min)*100}
+const later = fn => requestAnimationFrame(()=>requestAnimationFrame(fn));
+
+function barRow(label, v, m, focus, sub){
+  const row = el('div','row');
+  row.appendChild(el('div','row-l', label + (sub?`<small>${sub}</small>`:'')));
+  const track = el('div','track');
+  if(m.min<0){const zero=el('i','zero'); zero.style.left=pos(0,m.min,m.max)+'%'; track.appendChild(zero)}
+  const bar = el('div','bar'+(focus?' focus':''));
+  const a = pos(Math.min(0,v),m.min,m.max), b = pos(Math.max(0,v),m.min,m.max);
+  bar.style.left = a+'%';
+  track.appendChild(bar);
+  const val = el('span','val', m.fmt(v));
+  track.appendChild(val);
+  if(m.ref!=null){const ref=el('i','ref'); ref.style.left=pos(m.ref,m.min,m.max)+'%'; track.appendChild(ref)}
+  row.appendChild(track);
+  row._set = ()=>{bar.style.width=(b-a)+'%'; val.style.left=(v>=0?b:a)+'%'; val.style.transform=v>=0?'translateY(-50%)':'translate(-100%,-50%)'};
+  return row;
+}
+function simpleBars(box, list, m, textFn){
+  const rows=box.querySelector('.rows'); rows.innerHTML=''; const made=[];
+  list.forEach((s,i)=>{const r=barRow(s.n||s.l, s.v, m, s.f, textFn&&textFn(s,i)); rows.appendChild(r); made.push(r)});
+  later(()=>made.forEach(r=>r._set()));
+  return made;
+}
+
+const RENDER = {
+  stores(box){
+    const rows=box.querySelector('.rows'), note=box.querySelector('.note');
+    const draw=key=>{
+      const m=STORE_METRICS[key]; rows.innerHTML=''; const made=[];
+      [...DATA.stores].sort((x,y)=>y[key]-x[key]).forEach(s=>{const r=barRow(s.n,s[key],m,s.f); rows.appendChild(r); made.push(r)});
+      later(()=>made.forEach(r=>r._set())); note.textContent=NOTES[key];
+    };
+    box.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{
+      box.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b)); draw(b.dataset.m);
+    }));
+    draw('sales');
+  },
+  mix(box){
+    const rows=box.querySelector('.rows'); rows.innerHTML='';
+    const colors=['var(--purple)','var(--teal-d)','var(--teal)','var(--lav)']; const segs=[];
+    DATA.mix.forEach(r=>{
+      const row=el('div','row'); row.appendChild(el('div','row-l',r.n));
+      const st=el('div','stack');
+      r.parts.forEach((p,i)=>{
+        const s=el('i','',p>=6?f1(p)+'%':''); s.style.background=colors[i]; s.title=f1(p)+'%';
+        if(i===0)s.style.color='var(--cream)';
+        st.appendChild(s); segs.push([s,p]);
+      });
+      row.appendChild(st); rows.appendChild(row);
+    });
+    later(()=>segs.forEach(([s,p])=>s.style.width=p+'%'));
+  },
+  gap(box){
+    const note=box.querySelector('.note');
+    const made=simpleBars(box, DATA.gap.map((g,i)=>({...g,f:i===3})), {min:0,max:45,fmt:v=>f1(v)+' ₪'},
+      (g,i)=>i?`הוסר ${g.rm}% מהפער`:'הפער בין ממוצע לחציון');
+    made.forEach((r,i)=>{
+      r.tabIndex=0; const g=DATA.gap[i];
+      const say=()=>note.textContent=i===0?'הפער בין הממוצע לחציון בכל הקבלות: 39.3 ₪.':`בתוך קבוצות דומות הפער שנשאר הוא ${f1(g.v)} ₪, כלומר הוסרו ${g.rm}% מהפער.`;
+      r.addEventListener('mouseenter',say); r.addEventListener('focus',say);
+    });
+  },
+  cats(box){
+    const rows=box.querySelector('.rows');
+    const draw=mode=>{
+      rows.innerHTML=''; const bars=[]; const max=mode==='sales'?650:160;
+      DATA.cats.forEach(c=>{
+        const a=mode==='sales'?c.s1:c.p1, b=mode==='sales'?c.s4:c.p4;
+        const row=el('div','row');
+        row.appendChild(el('div','row-l',c.n+`<small>${mode==='sales'?sign(c.ds)+'%':sign(c.dp)+' אלף ₪'}</small>`));
+        const wrap=el('div',''); wrap.style.display='grid'; wrap.style.gap='3px';
+        [[a,'var(--lav)'],[b,'var(--purple)']].forEach(([v,col])=>{
+          const t=el('div','track'); t.style.height='18px';
+          const bar=el('div','bar'); bar.style.background=col; bar.style.top='2px'; bar.style.bottom='2px'; bar.style.left='0';
+          const val=el('span','val',f1(v)); val.style.fontSize='12px';
+          t.appendChild(bar); t.appendChild(val); wrap.appendChild(t); bars.push([bar,val,v]);
+        });
+        row.appendChild(wrap); rows.appendChild(row);
+      });
+      later(()=>bars.forEach(([bar,val,v])=>{const w=v/max*100; bar.style.width=w+'%'; val.style.left=w+'%'}));
+    };
+    box.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{
+      box.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b)); draw(b.dataset.m);
+    }));
+    draw('sales');
+  },
+  attach(box){
+    const rows=box.querySelector('.rows'); rows.innerHTML=''; const items=[];
+    DATA.attach.forEach(a=>{
+      const row=el('div','row'); row.appendChild(el('div','row-l',a.n));
+      const d=el('div','dumb'); d.style.marginBlock='16px';
+      const line=el('i','line'), h=el('i','dot h'), r=el('i','dot r');
+      const hv=el('span','dot-v',f1(a.h)+'%'), rv=el('span','dot-v',f1(a.r)+'%');
+      hv.style.top='-19px'; rv.style.top='32px';
+      h.title='חיפה '+f1(a.h)+'%'; r.title='שאר הרשת '+f1(a.r)+'%';
+      [line,h,r,hv,rv].forEach(x=>d.appendChild(x));
+      line.style.left='50%'; line.style.width='0'; [h,r,hv,rv].forEach(x=>x.style.left='50%');
+      row.appendChild(d); rows.appendChild(row); items.push([a,line,h,r,hv,rv]);
+    });
+    later(()=>items.forEach(([a,line,h,r,hv,rv])=>{
+      const lo=Math.min(a.h,a.r), hi=Math.max(a.h,a.r);
+      line.style.left=lo+'%'; line.style.width=(hi-lo)+'%';
+      h.style.left=a.h+'%'; r.style.left=a.r+'%'; hv.style.left=a.h+'%'; rv.style.left=a.r+'%';
+    }));
+  },
+  priority(box){ simpleBars(box, DATA.priority, {min:0,max:60,fmt:v=>'כ-'+f1(v)+' אלף ₪'}); }
+};
+
+/* accordion */
+const items=[...document.querySelectorAll('.q')];
+function setOpen(q, open){
+  q.classList.toggle('open',open);
+  q.querySelector('.q-head').setAttribute('aria-expanded',open);
+  q.querySelectorAll('[data-chart]').forEach(c=>{
+    if(open && !c.dataset.done){RENDER[c.dataset.chart](c); c.dataset.done=1}
+    if(!open) delete c.dataset.done;
+  });
+}
+items.forEach(q=>q.querySelector('.q-head').addEventListener('click',()=>{
+  const open=!q.classList.contains('open'); setOpen(q,open);
+  if(open) history.replaceState(null,'','#'+q.id);
+}));
+document.getElementById('openAll').addEventListener('click',()=>items.forEach(q=>setOpen(q,true)));
+document.getElementById('closeAll').addEventListener('click',()=>items.forEach(q=>setOpen(q,false)));
+function fromHash(){const q=document.getElementById(location.hash.slice(1)); if(q&&q.classList.contains('q')){setOpen(q,true); setTimeout(()=>q.scrollIntoView({behavior:'smooth',block:'start'}),60)}}
+window.addEventListener('hashchange',fromHash); fromHash();
+window.addEventListener('beforeprint',()=>items.forEach(q=>setOpen(q,true)));
+</script>
+</body>
+</html>

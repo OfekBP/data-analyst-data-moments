@@ -20,7 +20,9 @@ sql/                 one query per question
 excel/               build_workbook.py, recalc.ps1, the workbook
 tests/               pinned numbers + SQL == pandas + Excel == pandas
 outputs/             generated tables and results.json
-docs/answers.md      the deliverable
+docs/answers.md      the written answers (the two-page version)
+site/                the interactive submission page (deployed on Vercel)
+PRODUCT.md           product/brand context for the page
 ```
 
 ## Run
@@ -30,6 +32,20 @@ python -m dm_analyst.run_analysis        # tables + results.json + printed summa
 python -m dm_analyst.sql_check           # SQL results
 python -m pytest                         # proof: invariants, adaptivity, reference figures
 python -m excel.build_workbook           # rebuild the workbook (Windows + Excel: then run excel/recalc.ps1)
+```
+
+## The submission page (`site/`)
+`site/index.html` is the official, interactive submission: one static page (Hebrew, RTL) in Data Moments' visual
+identity with the five answers as an accordion, an executive summary, the data-quality description, the AI note and
+the supporting calculations. Its numbers are typed by hand, like `docs/answers.md`, and do not update with the data.
+`tests/test_site.py` only checks that every link it shows points at something that exists.
+
+Deploy on Vercel: import the repository, leave the framework as "Other" and keep the defaults. `vercel.json`
+sets the output directory to `site` and its build command copies the Excel workbook and `outputs/tables/` into
+`site/calculations/`, so the page's download links work (those copies are git-ignored). To preview locally:
+```bash
+mkdir -p site/calculations && cp excel/DataMoments_Analyst_Calculations.xlsx site/calculations/ && cp -r outputs/tables site/calculations/tables
+python -m http.server 5173 --directory site     # then open http://localhost:5173
 ```
 
 ## How the code is organised

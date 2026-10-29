@@ -1,0 +1,6 @@
+data/
+tests/
+dm_analyst/
+docs/
+.impeccable/
+__pycache__/
